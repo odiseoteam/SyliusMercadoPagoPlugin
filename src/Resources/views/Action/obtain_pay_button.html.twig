@@ -1,0 +1,21 @@
+{% extends '@SyliusShop/Checkout/layout.html.twig' %}
+
+{% block content %}
+    <div class="ui stackable grid">
+        <div class="eleven wide column">
+            <div class="ui padded segment" id="sylius-mercado-pago-plugin">
+                <form method="POST">
+                    <script
+                            src="https://www.mercadopago.com.ar/integrations/v1/web-payment-checkout.js"
+                            data-preference-id="{{ preference.id }}">
+                    </script>
+                </form>
+            </div>
+        </div>
+        <div class="five wide column">
+            {% include '@SyliusShop/Checkout/_summary.html.twig' with {'order': order} %}
+
+            {% include '@SyliusShop/Checkout/_support.html.twig' %}
+        </div>
+    </div>
+{% endblock %}

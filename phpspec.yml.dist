@@ -1,0 +1,4 @@
+suites:
+    main:
+        namespace: Odiseo\SyliusMercadoPagoPlugin
+        psr4_prefix: Odiseo\SyliusMercadoPagoPlugin

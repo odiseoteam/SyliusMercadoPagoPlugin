@@ -1,0 +1,6 @@
+services:
+    odiseo_sylius_mercado_pago.form.type.gateway_configuration.mercado_pago:
+        class: Odiseo\SyliusMercadoPagoPlugin\Form\Type\MercadoPagoGatewayConfigurationType
+        tags:
+            - { name: sylius.gateway_configuration_type, type: mercado_pago, label: "Mercado Pago" }
+            - { name: form.type }

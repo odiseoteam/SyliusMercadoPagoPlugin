@@ -1,0 +1,11 @@
+odiseo_sylius_ups:
+    form:
+        calculator:
+            account_number: Account number
+            access_key: Access key
+            username: Username
+            password: Password
+            postcode: Postcode
+            country_code: Country code
+            city: City
+            address: Address

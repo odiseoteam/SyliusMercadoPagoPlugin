@@ -1,0 +1,13 @@
+services:
+    odiseo_sylius_mercado_pago.payum_gateway_factory.mercado_pago:
+        class: Payum\Core\Bridge\Symfony\Builder\GatewayFactoryBuilder
+        arguments: [Odiseo\SyliusMercadoPagoPlugin\Payum\MercadoPagoGatewayFactory]
+        tags:
+            - { name: payum.gateway_factory_builder, factory: mercado_pago }
+
+    odiseo_sylius_mercado_pago.payum_action.mercado_pago.capture:
+        class: Odiseo\SyliusMercadoPagoPlugin\Payum\Action\CaptureAction
+        public: true
+        arguments: ['@templating.engine.twig']
+        tags:
+            - { name: payum.action, factory: mercado_pago, alias: payum.action.capture }
