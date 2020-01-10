@@ -13,13 +13,19 @@ use Payum\Core\ApiAwareInterface;
 use Payum\Core\Bridge\Symfony\Reply\HttpResponse;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Exception\UnsupportedApiException;
+use Payum\Core\GatewayAwareInterface;
+use Payum\Core\GatewayAwareTrait;
+use Payum\Core\Reply\HttpRedirect;
+use Sylius\Bundle\PayumBundle\Request\GetStatus;
 use Sylius\Component\Core\Model\OrderInterface;
 use Sylius\Component\Core\Model\PaymentInterface as SyliusPaymentInterface;
 use Payum\Core\Request\Capture;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
-final class CaptureAction implements ActionInterface, ApiAwareInterface
+final class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
 {
+    use GatewayAwareTrait;
+
     /**
      * @var MercadoPagoApi
      */
@@ -42,64 +48,64 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
         /** @var SyliusPaymentInterface $payment */
         $payment = $request->getModel();
 
-        /** @var OrderInterface $order */
-        $order = $payment->getOrder();
+        $this->gateway->execute($status = new GetStatus($payment));
 
-        $items = $order->getItems();
+        if ($status->isNew()) {
+            /** @var OrderInterface $order */
+            $order = $payment->getOrder();
 
-        SDK::setAccessToken($this->api->getAccessToken());
+            $items = $order->getItems();
 
-        //dd(1);
-        $preference = new Preference();
+            SDK::setAccessToken($this->api->getAccessToken());
 
-        try {
-            $preferenceItems = [];
-            foreach ($items as $item) {
-                $preferenceItem = new Item();
-                $preferenceItem->__set('title', $item->getProductName());
-                $preferenceItem->__set('quantity', $item->getQuantity());
-                $preferenceItem->__set('unit_price', $item->getUnitPrice() / 100);
+            $preference = new Preference();
 
-                $preferenceItems[] = $preferenceItem;
+            try {
+                $preferenceItems = [];
+                foreach ($items as $item) {
+                    $preferenceItem = new Item();
+                    $preferenceItem->__set('title', $item->getProductName());
+                    $preferenceItem->__set('quantity', $item->getQuantity());
+                    $preferenceItem->__set('unit_price', $item->getUnitPrice() / 100);
+
+                    $preferenceItems[] = $preferenceItem;
+                }
+
+                $preference->__set('items', $preferenceItems);
+
+                $preference->__set('back_urls', array(
+                    "success" => $request->getToken()->getAfterUrl(),
+                    "failure" => $request->getToken()->getAfterUrl(),
+                    "pending" => $request->getToken()->getAfterUrl(),
+                ));
+                $preference->__set('auto_return', "all");
+
+                $status = 400;
+                $message = 'KO';
+
+                if ($preference->save()) {
+                    $status = 200;
+                    $message = 'Preference created!';
+                    $preferenceId = $preference->__get('id');
+                }
+
+                $response = [
+                    'status' => $status,
+                    'message' => $message,
+                    'preference_id' => $preferenceId
+                ];
+            } catch (\Exception $exception) {
+                $response = [
+                    'status' => $exception->getCode(),
+                    'message' => $exception->getMessage()
+                ];
+            } finally {
+                $payment->setDetails($response);
             }
 
-            $preference->__set('items', $preferenceItems);
-
-            $preference->__set('back_urls', array(
-                "success" => $request->getToken()->getAfterUrl(),
-                "failure" => $request->getToken()->getAfterUrl(),
-                "pending" => $request->getToken()->getAfterUrl(),
-            ));
-            $preference->__set('auto_return', "all");
-
-            $status = 400;
-            $message = 'KO';
-
-            if ($preference->save()) {
-                $status = 200;
-                $message = 'OK';
+            if ($response['status'] === 200) {
+                throw new HttpRedirect($preference->__get('init_point'));
             }
-
-            $response = [
-                'status' => $status,
-                'message' => $message
-            ];
-        } catch (\Exception $exception) {
-            $response = [
-                'status' => 400,
-                'message' => $exception->getMessage()
-            ];
-        } finally {
-            $payment->setDetails($response);
-        }
-
-        if ($response['status'] === 200) {
-            $viewResponse = $this->twig->renderResponse('bundles/SyliusShopBundle/Checkout/obtain_pay_button.html.twig', [
-                'preference' => $preference,
-                'order' => $order
-            ]);
-
-            throw new HttpResponse($viewResponse);
         }
     }
 
