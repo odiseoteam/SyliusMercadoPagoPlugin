@@ -49,6 +49,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
 
         SDK::setAccessToken($this->api->getAccessToken());
 
+        //dd(1);
         $preference = new Preference();
 
         try {
@@ -63,6 +64,13 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
             }
 
             $preference->__set('items', $preferenceItems);
+
+            $preference->__set('back_urls', array(
+                "success" => $request->getToken()->getAfterUrl(),
+                "failure" => $request->getToken()->getAfterUrl(),
+                "pending" => $request->getToken()->getAfterUrl(),
+            ));
+            $preference->__set('auto_return', "all");
 
             $status = 400;
             $message = 'KO';
@@ -86,7 +94,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
         }
 
         if ($response['status'] === 200) {
-            $viewResponse = $this->twig->renderResponse('@OdiseoSyliusMercadoPagoPlugin/Action/obtain_pay_button.html.twig', [
+            $viewResponse = $this->twig->renderResponse('bundles/SyliusShopBundle/Checkout/obtain_pay_button.html.twig', [
                 'preference' => $preference,
                 'order' => $order
             ]);
@@ -100,7 +108,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
         return
             $request instanceof Capture &&
             $request->getModel() instanceof SyliusPaymentInterface
-        ;
+            ;
     }
 
     public function setApi($api): void

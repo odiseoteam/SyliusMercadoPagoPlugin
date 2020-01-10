@@ -16,10 +16,7 @@ final class StatusAction implements ActionInterface
         /** @var GetStatusInterface $request */
         RequestNotSupportedException::assertSupports($this, $request);
 
-        /** @var SyliusPaymentInterface $payment */
-        $payment = $request->getModel();
-
-        $details = $payment->getDetails();
+        $details = $request->getModel();
 
         if (200 === $details['status']) {
             $request->markCaptured();
@@ -38,7 +35,7 @@ final class StatusAction implements ActionInterface
     {
         return
             $request instanceof GetStatusInterface &&
-            $request->getModel() instanceof SyliusPaymentInterface
-        ;
+            $request->getModel() instanceof \ArrayAccess
+            ;
     }
 }
