@@ -90,7 +90,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
                         $image = $product->getImagesByType('thumbnail')->first();
 
                         $path = $this->imagineCacheManager->getBrowserPath(
-                            parse_url($image->getPath(), PHP_URL_PATH),
+                            (string)parse_url($image->getPath() ?: '', PHP_URL_PATH),
                             'sylius_shop_product_tiny_thumbnail'
                         );
                     } elseif ($product->getImages()->first()) {
@@ -98,7 +98,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
                         $image = $product->getImages()->first();
 
                         $path = $this->imagineCacheManager->getBrowserPath(
-                            parse_url($image->getPath(), PHP_URL_PATH),
+                            (string)parse_url($image->getPath() ?: '', PHP_URL_PATH),
                             'sylius_shop_product_tiny_thumbnail'
                         );
                     } else {
@@ -157,7 +157,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
                         'number' => $payerPhoneNumber
                     ]);
                 }
-                if ($billingAddress) {
+                if ($billingAddress instanceof AddressInterface) {
                     $payer->__set('address', [
                         'street_name' => $billingAddress->getStreet(),
                         'zip_code' => $billingAddress->getPostcode(),
