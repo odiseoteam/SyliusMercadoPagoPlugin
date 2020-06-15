@@ -10,6 +10,9 @@ use Payum\Core\GatewayFactory;
 
 final class MercadoPagoGatewayFactory extends GatewayFactory
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function populateConfig(ArrayObject $config): void
     {
         $config->defaults([

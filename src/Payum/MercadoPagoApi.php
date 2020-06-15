@@ -14,6 +14,9 @@ final class MercadoPagoApi
         $this->accessToken = $accessToken;
     }
 
+    /**
+     * @return string
+     */
     public function getAccessToken(): string
     {
         return $this->accessToken;

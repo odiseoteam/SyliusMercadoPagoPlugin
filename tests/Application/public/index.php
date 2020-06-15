@@ -1,6 +1,6 @@
 <?php
 
-use Symfony\Component\Debug\Debug;
+use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
 use Tests\Odiseo\SyliusMercadoPagoPlugin\Application\Kernel;
 

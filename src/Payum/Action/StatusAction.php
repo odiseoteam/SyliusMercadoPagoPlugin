@@ -11,18 +11,19 @@ use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\GetHttpRequest;
 use Payum\Core\Request\GetStatusInterface;
-use Sylius\Bundle\PayumBundle\Request\GetStatus;
-use Sylius\Component\Core\Model\PaymentInterface as SyliusPaymentInterface;
 
 final class StatusAction implements ActionInterface, GatewayAwareInterface
 {
     use GatewayAwareTrait;
 
+    /**
+     * {@inheritdoc}
+     */
     public function execute($request): void
     {
         /** @var GetStatusInterface $request */
         RequestNotSupportedException::assertSupports($this, $request);
-        
+
         /** @var ArrayObject $payment */
         $payment = $request->getModel();
         $paymentDetails = $payment->toUnsafeArray();
@@ -45,11 +46,14 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supports($request): bool
     {
         return
             $request instanceof GetStatusInterface &&
             $request->getModel() instanceof \ArrayAccess
-            ;
+        ;
     }
 }
