@@ -28,7 +28,7 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
         $payment = $request->getModel();
         $paymentDetails = $payment->toUnsafeArray();
 
-        if (empty($paymentDetails) || !isset($paymentDetails['preference_id'])) {
+        if (empty($paymentDetails) || !$paymentDetails['preference']) {
             $request->markNew();
 
             return;
@@ -41,8 +41,10 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
             $request->markCaptured();
         } else if ($status === 'rejected') {
             $request->markFailed();
-        } else {
+        } else if ($status === 'in_process') {
             $request->markPending();
+        } else {
+            $request->markCanceled();
         }
     }
 

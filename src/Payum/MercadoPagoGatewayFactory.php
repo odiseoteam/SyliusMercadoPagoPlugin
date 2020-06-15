@@ -22,7 +22,10 @@ final class MercadoPagoGatewayFactory extends GatewayFactory
         ]);
 
         $config['payum.api'] = function (ArrayObject $config) {
-            return new MercadoPagoApi($config['access_token']);
+            return new MercadoPagoApi(
+                $config['access_token'],
+                $config['sandbox']
+            );
         };
     }
 }

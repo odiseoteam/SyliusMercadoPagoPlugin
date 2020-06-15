@@ -1,0 +1,6 @@
+odiseo_sylius_mercado_pago_plugin:
+    form:
+        gateway_configuration:
+            mercado_pago:
+                access_token: Token de acceso
+                sandbox: Sandbox

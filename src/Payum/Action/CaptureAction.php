@@ -46,6 +46,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
      */
     public function execute($request): void
     {
+        /** @var $request Capture */
         RequestNotSupportedException::assertSupports($this, $request);
 
         /** @var SyliusPaymentInterface $payment */
@@ -59,6 +60,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
 
             /** @var CustomerInterface $customer */
             $customer = $order->getCustomer();
+
             /** @var AddressInterface $billingAddress */
             $billingAddress = $order->getBillingAddress();
 
@@ -73,6 +75,8 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
 
                 foreach ($items as $item) {
                     $preferenceItem = new Item();
+
+                    $preferenceItem->__set('id', $item->getId());
                     $preferenceItem->__set('title', $item->getProductName());
                     $preferenceItem->__set('quantity', $item->getQuantity());
                     $preferenceItem->__set('currency_id', $order->getCurrencyCode());
@@ -106,6 +110,30 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
                     $preferenceItems[] = $preferenceItem;
                 }
 
+                if ($order->getShippingTotal() > 0) {
+                    $shipment = new Item();
+
+                    $shipment->__set('id', 'shipping');
+                    $shipment->__set('title', 'Shipping');
+                    $shipment->__set('quantity', 1);
+                    $shipment->__set('currency_id', $order->getCurrencyCode());
+                    $shipment->__set('unit_price', $order->getShippingTotal() / 100);
+
+                    $preferenceItems[] = $shipment;
+                }
+
+                if ($order->getAdjustmentsTotalRecursively('tax') > 0) {
+                    $tax = new Item();
+
+                    $tax->__set('id', 'tax');
+                    $tax->__set('title', 'Tax');
+                    $tax->__set('quantity', 1);
+                    $tax->__set('currency_id', $order->getCurrencyCode());
+                    $tax->__set('unit_price', $order->getAdjustmentsTotalRecursively('tax') / 100);
+
+                    $preferenceItems[] = $tax;
+                }
+
                 $preference->__set('items', $preferenceItems);
 
                 $payer = new Payer();
@@ -126,54 +154,60 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
                 }
                 if ($payerPhoneNumber) {
                     $payer->__set('phone', [
-                        'area_code' => '',
                         'number' => $payerPhoneNumber
                     ]);
                 }
                 if ($billingAddress) {
                     $payer->__set('address', [
                         'street_name' => $billingAddress->getStreet(),
-                        'street_number' => '',
                         'zip_code' => $billingAddress->getPostcode(),
                     ]);
                 }
 
                 $preference->__set('payer', $payer);
 
-                $preference->__set('back_urls', array(
-                    "success" => $request->getToken()->getAfterUrl(),
-                    "failure" => $request->getToken()->getAfterUrl(),
-                    "pending" => $request->getToken()->getAfterUrl(),
-                ));
+                $preference->__set('external_reference', $order->getNumber());
 
-                $preference->__set('auto_return', "all");
+                $preference->__set('back_urls', [
+                    'success' => $request->getToken()->getAfterUrl(),
+                    'failure' => $request->getToken()->getAfterUrl(),
+                    'pending' => $request->getToken()->getAfterUrl()
+                ]);
+
+                $preference->__set('auto_return', 'all');
 
                 $status = 400;
                 $message = 'KO';
-                $preferenceId = null;
+                $preferenceData = null;
 
                 if ($preference->save()) {
                     $status = 200;
                     $message = 'Preference created!';
-                    $preferenceId = $preference->__get('id');
+                    $preferenceData = $preference->toArray();
                 }
 
                 $response = [
                     'status' => $status,
                     'message' => $message,
-                    'preference_id' => $preferenceId
+                    'preference' => $preferenceData
                 ];
             } catch (\Exception $exception) {
                 $response = [
                     'status' => $exception->getCode(),
-                    'message' => $exception->getMessage()
+                    'message' => $exception->getMessage(),
+                    'preference' => null
                 ];
             } finally {
                 $payment->setDetails($response);
             }
 
             if ($response['status'] === 200) {
-                throw new HttpRedirect($preference->__get('init_point'));
+                $initPoint = $this->api->isSandbox()
+                    ? $preference->__get('sandbox_init_point')
+                    : $preference->__get('init_point')
+                ;
+
+                throw new HttpRedirect($initPoint);
             }
         }
     }
