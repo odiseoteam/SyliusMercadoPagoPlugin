@@ -41,7 +41,7 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
             $request->markCaptured();
         } else if ($status === 'rejected') {
             $request->markFailed();
-        } else if ($status === 'in_process') {
+        } else if ($status === 'pending') {
             $request->markPending();
         } else {
             $request->markCanceled();
