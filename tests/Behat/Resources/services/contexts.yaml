@@ -1,0 +1,34 @@
+services:
+    odiseo_sylius_mercado_pago_plugin.context.setup.payment:
+        class: Tests\Odiseo\SyliusMercadoPagoPlugin\Behat\Context\Setup\PaymentContext
+        public: true
+        arguments:
+            - '@sylius.behat.shared_storage'
+            - '@sylius.repository.payment_method'
+            - '@sylius.fixture.example_factory.payment_method'
+            - '@sylius.factory.payment_method_translation'
+            - '@sylius.manager.payment_method'
+            -
+                offline: Offline
+                paypal_express_checkout: Paypal Express Checkout
+                stripe_checkout: Stripe Checkout
+                mercado_pago: Mercado Pago
+        tags:
+            - { name: fob.context_service }
+
+    odiseo_sylius_mercado_pago_plugin.context.ui.admin.managing_payment_methods:
+        class: Tests\Odiseo\SyliusMercadoPagoPlugin\Behat\Context\Ui\Admin\ManagingPaymentMethodsContext
+        public: true
+        arguments:
+            - "@odiseo_sylius_mercado_pago_plugin.page.admin.payment_method.create_page"
+            - "@sylius.behat.page.admin.payment_method.index"
+            - "@sylius.behat.page.admin.payment_method.update"
+            - "@sylius.behat.current_page_resolver"
+            - "@sylius.behat.notification_checker"
+            -
+                offline: Offline
+                paypal_express_checkout: Paypal Express Checkout
+                stripe_checkout: Stripe Checkout
+                mercado_pago: Mercado Pago
+        tags:
+            - { name: fob.context_service }

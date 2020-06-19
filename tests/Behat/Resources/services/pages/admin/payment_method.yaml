@@ -1,0 +1,7 @@
+services:
+    odiseo_sylius_mercado_pago_plugin.page.admin.payment_method.create_page:
+        class: Tests\Odiseo\SyliusMercadoPagoPlugin\Behat\Page\Admin\PaymentMethod\CreatePage
+        parent: sylius.behat.page.admin.crud.create
+        public: false
+        arguments:
+            - 'sylius_admin_payment_method_create'
