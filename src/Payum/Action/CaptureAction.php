@@ -21,10 +21,10 @@ use Payum\Core\Request\Capture;
 use Sylius\Bundle\PayumBundle\Request\GetStatus;
 use Sylius\Component\Core\Model\AddressInterface;
 use Sylius\Component\Core\Model\CustomerInterface;
-use Sylius\Component\Core\Model\ImageInterface;
+// use Sylius\Component\Core\Model\ImageInterface;
 use Sylius\Component\Core\Model\OrderInterface;
 use Sylius\Component\Core\Model\PaymentInterface as SyliusPaymentInterface;
-use Sylius\Component\Core\Model\ProductInterface;
+// use Sylius\Component\Core\Model\ProductInterface;
 
 final class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
 {
@@ -64,7 +64,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
             /** @var AddressInterface $billingAddress */
             $billingAddress = $order->getBillingAddress();
 
-            $items = $order->getItems();
+//            $items = $order->getItems();
 
             SDK::setAccessToken($this->api->getAccessToken());
 
@@ -73,66 +73,78 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
             try {
                 $preferenceItems = [];
 
-                foreach ($items as $item) {
-                    $preferenceItem = new Item();
+//                TODO create items for products when MercadoPago fix the API
 
-                    $preferenceItem->__set('id', $item->getId());
-                    $preferenceItem->__set('title', $item->getProductName());
-                    $preferenceItem->__set('quantity', $item->getQuantity());
-                    $preferenceItem->__set('currency_id', $order->getCurrencyCode());
-                    $preferenceItem->__set('unit_price', $item->getUnitPrice() / 100);
+//                foreach ($items as $item) {
+//                    $preferenceItem = new Item();
+//
+//                    $preferenceItem->__set('id', $item->getId());
+//                    $preferenceItem->__set('title', $item->getProductName());
+//                    $preferenceItem->__set('quantity', $item->getQuantity());
+//                    $preferenceItem->__set('currency_id', $order->getCurrencyCode());
+//                    $preferenceItem->__set('unit_price', $item->getUnitPrice() / 100);
+//
+//                    /** @var ProductInterface $product */
+//                    $product = $item->getProduct();
+//
+//                    if (!$product->getImagesByType('thumbnail')->isEmpty()) {
+//                        /** @var ImageInterface $image */
+//                        $image = $product->getImagesByType('thumbnail')->first();
+//
+//                        $path = $this->imagineCacheManager->getBrowserPath(
+//                            (string)parse_url($image->getPath() ?: '', PHP_URL_PATH),
+//                            'sylius_shop_product_tiny_thumbnail'
+//                        );
+//                    } elseif ($product->getImages()->first()) {
+//                        /** @var ImageInterface $image */
+//                        $image = $product->getImages()->first();
+//
+//                        $path = $this->imagineCacheManager->getBrowserPath(
+//                            (string)parse_url($image->getPath() ?: '', PHP_URL_PATH),
+//                            'sylius_shop_product_tiny_thumbnail'
+//                        );
+//                    } else {
+//                        $path = '//placehold.it/64x64';
+//                    }
+//
+//                    $preferenceItem->__set('picture_url', $path);
+//
+//                    $preferenceItems[] = $preferenceItem;
+//                }
+//
+//                if ($order->getShippingTotal() > 0) {
+//                    $shipment = new Item();
+//
+//                    $shipment->__set('id', 'shipping');
+//                    $shipment->__set('title', 'Shipping');
+//                    $shipment->__set('quantity', 1);
+//                    $shipment->__set('currency_id', $order->getCurrencyCode());
+//                    $shipment->__set('unit_price', $order->getShippingTotal() / 100);
+//
+//                    $preferenceItems[] = $shipment;
+//                }
+//
+//                if ($order->getAdjustmentsTotalRecursively('tax') > 0) {
+//                    $tax = new Item();
+//
+//                    $tax->__set('id', 'tax');
+//                    $tax->__set('title', 'Tax');
+//                    $tax->__set('quantity', 1);
+//                    $tax->__set('currency_id', $order->getCurrencyCode());
+//                    $tax->__set('unit_price', $order->getAdjustmentsTotalRecursively('tax') / 100);
+//
+//                    $preferenceItems[] = $tax;
+//                }
 
-                    /** @var ProductInterface $product */
-                    $product = $item->getProduct();
+                $preferenceItem = new Item();
 
-                    if (!$product->getImagesByType('thumbnail')->isEmpty()) {
-                        /** @var ImageInterface $image */
-                        $image = $product->getImagesByType('thumbnail')->first();
+                $preferenceItem->__set('id', $order->getId());
+                $preferenceItem->__set('title', 'TOTAL');
+                $preferenceItem->__set('quantity', 1);
+                $preferenceItem->__set('currency_id', $order->getCurrencyCode());
+                $preferenceItem->__set('unit_price', $order->getTotal() / 100);
 
-                        $path = $this->imagineCacheManager->getBrowserPath(
-                            (string)parse_url($image->getPath() ?: '', PHP_URL_PATH),
-                            'sylius_shop_product_tiny_thumbnail'
-                        );
-                    } elseif ($product->getImages()->first()) {
-                        /** @var ImageInterface $image */
-                        $image = $product->getImages()->first();
-
-                        $path = $this->imagineCacheManager->getBrowserPath(
-                            (string)parse_url($image->getPath() ?: '', PHP_URL_PATH),
-                            'sylius_shop_product_tiny_thumbnail'
-                        );
-                    } else {
-                        $path = '//placehold.it/64x64';
-                    }
-
-                    $preferenceItem->__set('picture_url', $path);
-
-                    $preferenceItems[] = $preferenceItem;
-                }
-
-                if ($order->getShippingTotal() > 0) {
-                    $shipment = new Item();
-
-                    $shipment->__set('id', 'shipping');
-                    $shipment->__set('title', 'Shipping');
-                    $shipment->__set('quantity', 1);
-                    $shipment->__set('currency_id', $order->getCurrencyCode());
-                    $shipment->__set('unit_price', $order->getShippingTotal() / 100);
-
-                    $preferenceItems[] = $shipment;
-                }
-
-                if ($order->getAdjustmentsTotalRecursively('tax') > 0) {
-                    $tax = new Item();
-
-                    $tax->__set('id', 'tax');
-                    $tax->__set('title', 'Tax');
-                    $tax->__set('quantity', 1);
-                    $tax->__set('currency_id', $order->getCurrencyCode());
-                    $tax->__set('unit_price', $order->getAdjustmentsTotalRecursively('tax') / 100);
-
-                    $preferenceItems[] = $tax;
-                }
+                $preferenceItems[] = $preferenceItem;
 
                 $preference->__set('items', $preferenceItems);
 
