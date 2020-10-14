@@ -25,7 +25,7 @@
 ## Description
 
 This plugin add Mercado Pago payment method to the Sylius project.
-[Mercado Pago Developers](https://sylius-demo.odiseo.com.ar).
+[Mercado Pago Developers](https://www.mercadopago.com.ar/developers/es/guides).
 
 <img src="https://github.com/odiseoteam/SyliusMercadoPagoPlugin/blob/master/screenshot_1.png" alt="Mercado Pago payment">
 
