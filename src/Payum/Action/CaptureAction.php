@@ -68,6 +68,8 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
 
             SDK::setAccessToken($this->api->getAccessToken());
 
+            SDK::setIntegratorId('dev_11586dc9e7f311eab4a00242ac130004');
+
             $preference = new Preference();
 
             try {
