@@ -35,6 +35,13 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
         }
 
         $this->gateway->execute($httpRequest = new GetHttpRequest());
+
+        if (!isset($httpRequest->query['collection_status'])) {
+            $request->markNew();
+
+            return;
+        }
+
         $status = $httpRequest->query['collection_status'];
 
         if ($status === 'approved') {
