@@ -18,17 +18,22 @@ use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Reply\HttpRedirect;
 use Payum\Core\Request\Capture;
+use Payum\Core\Security\GenericTokenFactoryAwareInterface;
+use Payum\Core\Security\GenericTokenFactoryAwareTrait;
 use Sylius\Bundle\PayumBundle\Request\GetStatus;
 use Sylius\Component\Core\Model\AddressInterface;
 use Sylius\Component\Core\Model\CustomerInterface;
-// use Sylius\Component\Core\Model\ImageInterface;
 use Sylius\Component\Core\Model\OrderInterface;
 use Sylius\Component\Core\Model\PaymentInterface as SyliusPaymentInterface;
-// use Sylius\Component\Core\Model\ProductInterface;
 
-final class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
+final class CaptureAction implements
+    ActionInterface,
+    ApiAwareInterface,
+    GatewayAwareInterface,
+    GenericTokenFactoryAwareInterface
 {
     use GatewayAwareTrait;
+    use GenericTokenFactoryAwareTrait;
 
     /** @var MercadoPagoApi */
     private $api;
@@ -140,15 +145,31 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
 
                 $preferenceItem = new Item();
 
+                $orderTotal = $order->getTotal() / 100;
+
                 $preferenceItem->__set('id', $order->getId());
                 $preferenceItem->__set('title', 'TOTAL');
                 $preferenceItem->__set('quantity', 1);
                 $preferenceItem->__set('currency_id', $order->getCurrencyCode());
-                $preferenceItem->__set('unit_price', $order->getTotal() / 100);
+                $preferenceItem->__set('unit_price', $orderTotal);
 
                 $preferenceItems[] = $preferenceItem;
 
                 $preference->__set('items', $preferenceItems);
+
+                /** Todo try to implement installments
+                $preferencePayment = new Payment();
+
+                $channel = $order->getChannel();
+                $minimumForInstalments = $channel->getMinimumOrderTotalForInstalments();
+                if ($minimumForInstalments) {
+                    if ($orderTotal < $minimumForInstalments) {
+                        $preferencePayment->__set('installments', 1);
+                    }
+                }
+
+                $preference->__set('payment_methods', $preferencePayment);
+                 **/
 
                 $payer = new Payer();
 
@@ -187,6 +208,13 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Gateway
                     'failure' => $request->getToken()->getAfterUrl(),
                     'pending' => $request->getToken()->getAfterUrl()
                 ]);
+
+                // Create notification url with Notify Token
+                $notifyToken = $this->tokenFactory->createNotifyToken(
+                    $request->getToken()->getGatewayName(),
+                    $request->getToken()->getDetails()
+                );
+                $preference->__set('notification_url', $notifyToken->getTargetUrl().'?source_news=webhooks');
 
                 $preference->__set('auto_return', 'all');
 

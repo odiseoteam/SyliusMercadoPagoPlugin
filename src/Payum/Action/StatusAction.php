@@ -24,31 +24,38 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
         /** @var GetStatusInterface $request */
         RequestNotSupportedException::assertSupports($this, $request);
 
-        /** @var ArrayObject $payment */
-        $payment = $request->getModel();
-        $paymentDetails = $payment->toUnsafeArray();
+        /** @var ArrayObject $details */
+        $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        if (empty($paymentDetails) || !$paymentDetails['preference']) {
+        if (empty($details) || !isset($details['preference'])) {
             $request->markNew();
 
             return;
         }
+
+        $status = null;
 
         $this->gateway->execute($httpRequest = new GetHttpRequest());
 
-        if (!isset($httpRequest->query['collection_status'])) {
+        if (isset($httpRequest->query['collection_status'])) {
+            $status = $httpRequest->query['collection_status'];
+        }
+
+        if (!$status && isset($details['payment']) && isset($details['payment']['status'])) {
+            $status = $details['payment']['status'];
+        }
+
+        if (!$status) {
             $request->markNew();
 
             return;
         }
 
-        $status = $httpRequest->query['collection_status'];
-
-        if ($status === 'approved') {
+        if ('approved' === $status) {
             $request->markCaptured();
-        } elseif ($status === 'rejected') {
+        } elseif ('rejected' === $status) {
             $request->markFailed();
-        } elseif ($status === 'pending') {
+        } elseif ('pending' === $status || 'in_process' === $status) {
             $request->markPending();
         } else {
             $request->markCanceled();

@@ -12,3 +12,9 @@ services:
             - '@liip_imagine.cache.manager'
         tags:
             - { name: payum.action, factory: mercado_pago, alias: payum.action.capture }
+
+    odiseo_sylius_mercado_pago_plugin.payum_action.mercado_pago.notify:
+        class: Odiseo\SyliusMercadoPagoPlugin\Payum\Action\NotifyAction
+        public: true
+        tags:
+            - { name: payum.action, factory: mercado_pago, alias: payum.action.notify }
