@@ -24,10 +24,9 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
         /** @var GetStatusInterface $request */
         RequestNotSupportedException::assertSupports($this, $request);
 
-        /** @var ArrayObject $details */
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        if (empty($details) || !isset($details['preference'])) {
+        if (count($details) === 0 || !isset($details['preference'])) {
             $request->markNew();
 
             return;

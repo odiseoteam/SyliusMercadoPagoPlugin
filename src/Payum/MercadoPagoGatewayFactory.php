@@ -21,7 +21,7 @@ final class MercadoPagoGatewayFactory extends GatewayFactory
             'payum.action.status' => new StatusAction(),
         ]);
 
-        $config['payum.api'] = function (ArrayObject $config) {
+        $config['payum.api'] = function (ArrayObject $config): MercadoPagoApi {
             return new MercadoPagoApi(
                 $config['access_token'],
                 $config['sandbox']

@@ -21,6 +21,7 @@
         <img src="https://poser.pugx.org/odiseoteam/sylius-mercado-pago-plugin/downloads" />
     </a>
 </h1>
+<p align="center"><a href="https://sylius.com/partners/odiseo/" target="_blank"><img src="https://github.com/odiseoteam/SyliusVendorPlugin/blob/master/badge-partner-by-sylius.png" width="140"></a></p>
 
 ## Description
 
@@ -33,34 +34,13 @@ This plugin add Mercado Pago payment method to the Sylius project.
 
 You can see this plugin in action in our Sylius Demo application.
 
-- Frontend: [sylius-demo.odiseo.com.ar](https://sylius-demo.odiseo.com.ar). 
+- Frontend: [sylius-demo.odiseo.com.ar](https://sylius-demo.odiseo.com.ar).
 - Administration: [sylius-demo.odiseo.com.ar/admin](https://sylius-demo.odiseo.com.ar/admin) with `odiseo: odiseo` credentials.
 
-## Installation
+## Documentation
 
-1. Run `composer require odiseoteam/sylius-mercado-pago-plugin`
-
-2. Enable the plugin in bundles.php:
-
-```php
-<?php
-
-return [
-    // ...
-    Odiseo\SyliusMercadoPagoPlugin\OdiseoSyliusMercadoPagoPlugin::class => ['all' => true],
-];
-```
-
-3. Import the plugin configurations
-
-```yml
-imports:
-    - { resource: "@OdiseoSyliusMercadoPagoPlugin/Resources/config/config.yaml" }
-```
-
-## Test the plugin
-
-You can follow the instructions to test this plugins in the proper documentation page: [Test the plugin](doc/tests.md).
+- [Installation](doc/installation.md)
+- [Tests](doc/tests.md)
 
 ## Credits
 

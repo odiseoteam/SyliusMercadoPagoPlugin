@@ -35,18 +35,21 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
 
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        $data = json_decode(file_get_contents("php://input"), true);
-        $this->log($data);
+        $content = file_get_contents("php://input");
+        if ($content !== false) {
+            $data = json_decode($content, true);
+            $this->log($data);
 
-        SDK::setAccessToken($this->api->getAccessToken());
-        SDK::setIntegratorId('dev_11586dc9e7f311eab4a00242ac130004');
+            SDK::setAccessToken($this->api->getAccessToken());
+            SDK::setIntegratorId('dev_11586dc9e7f311eab4a00242ac130004');
 
-        if ('payment' == $data['type']) {
-            /** @var Payment $payment */
-            $payment = Payment::find_by_id($data['data']['id']);
+            if ('payment' == $data['type']) {
+                /** @var Payment $payment */
+                $payment = Payment::find_by_id($data['data']['id']);
 
-            $paymentArray = $payment->toArray();
-            $details['payment'] = $paymentArray;
+                $paymentArray = $payment->toArray();
+                $details['payment'] = $paymentArray;
+            }
         }
 
         throw new HttpResponse('OK', Response::HTTP_OK);
@@ -68,7 +71,7 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
     /**
      * {@inheritDoc}
      */
-    public function supports($request)
+    public function supports($request): bool
     {
         return
             $request instanceof Notify &&

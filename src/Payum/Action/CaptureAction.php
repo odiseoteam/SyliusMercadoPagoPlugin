@@ -51,7 +51,7 @@ final class CaptureAction implements
      */
     public function execute($request): void
     {
-        /** @var $request Capture */
+        /** @var Capture $request */
         RequestNotSupportedException::assertSupports($this, $request);
 
         /** @var SyliusPaymentInterface $payment */
@@ -173,31 +173,30 @@ final class CaptureAction implements
 
                 $payer = new Payer();
 
-                $payerFirstName = $customer->getFirstName() ?: $billingAddress->getFirstName();
-                $payerLastName = $customer->getLastName() ?: $billingAddress->getLastName();
-                $payerEmail = $customer->getEmail() ?: null;
-                $payerPhoneNumber = $customer->getPhoneNumber() ?: $billingAddress->getPhoneNumber();
+                $payerFirstName = $customer->getFirstName() !== null ? $customer->getFirstName() : $billingAddress->getFirstName();
+                $payerLastName = $customer->getLastName() !== null ? $customer->getLastName() : $billingAddress->getLastName();
+                $payerEmail = $customer->getEmail() !== null ? $customer->getEmail() : null;
+                $payerPhoneNumber = $customer->getPhoneNumber() !== null ? $customer->getPhoneNumber() : $billingAddress->getPhoneNumber();
 
-                if ($payerFirstName) {
+                if ($payerFirstName !== null) {
                     $payer->__set('name', $payerFirstName);
                 }
-                if ($payerLastName) {
+                if ($payerLastName !== null) {
                     $payer->__set('surname', $payerLastName);
                 }
-                if ($payerEmail) {
+                if ($payerEmail !== null) {
                     $payer->__set('email', $payerEmail);
                 }
-                if ($payerPhoneNumber) {
+                if ($payerPhoneNumber !== null) {
                     $payer->__set('phone', [
                         'number' => $payerPhoneNumber
                     ]);
                 }
-                if ($billingAddress instanceof AddressInterface) {
-                    $payer->__set('address', [
-                        'street_name' => $billingAddress->getStreet(),
-                        'zip_code' => $billingAddress->getPostcode(),
-                    ]);
-                }
+
+                $payer->__set('address', [
+                    'street_name' => $billingAddress->getStreet(),
+                    'zip_code' => $billingAddress->getPostcode(),
+                ]);
 
                 $preference->__set('payer', $payer);
 
@@ -222,7 +221,7 @@ final class CaptureAction implements
                 $message = 'KO';
                 $preferenceData = null;
 
-                if ($preference->save()) {
+                if ($preference->save() === true) {
                     $status = 200;
                     $message = 'Preference created!';
                     $preferenceData = $preference->toArray();

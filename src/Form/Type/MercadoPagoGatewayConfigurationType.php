@@ -31,7 +31,7 @@ final class MercadoPagoGatewayConfigurationType extends AbstractType
             ->add('sandbox', CheckboxType::class, [
                 'label' => 'odiseo_sylius_mercado_pago_plugin.form.gateway_configuration.mercado_pago.sandbox',
             ])
-            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
                 $data = $event->getData();
 
                 $data['payum.http_client'] = '@sylius.payum.http_client';
