@@ -10,8 +10,7 @@
     "description": "Plugin for Sylius to add Mercado Pago payment method",
     "license": "MIT",
     "require": {
-        "php": "^7.3",
-
+        "php": "^7.3|^8.0",
         "sylius/sylius": "^1.3",
         "mercadopago/dx-php": "^2.2"
     },
