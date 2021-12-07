@@ -1,0 +1,8 @@
+monolog:
+    channels: ['mercadopago']
+    handlers:
+        mercadopago:
+            type: stream
+            path: "%kernel.logs_dir%/mercadopago_%kernel.environment%.log"
+            level: info
+            channels: [mercadopago]

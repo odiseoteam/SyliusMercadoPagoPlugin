@@ -1,9 +1,7 @@
-<h1 align="center">
-    <a href="https://odiseo.com.ar/" target="_blank" title="Odiseo">
-        <img src="https://github.com/odiseoteam/SyliusMercadoPagoPlugin/blob/master/logo_odiseo.png" alt="Odiseo" width="300px" />
+<p align="center">
+    <a href="https://www.mercadopago.com" target="_blank" title="MercadoPago">
+        <img src="https://github.com/odiseoteam/SyliusMercadoPagoPlugin/blob/master/mercadopago-logo.png" alt="MercadoPago Logo" width="600px"/>
     </a>
-    <br />
-    Odiseo Sylius Mercado Pago Plugin
     <br />
     <a href="https://packagist.org/packages/odiseoteam/sylius-mercado-pago-plugin" title="License" target="_blank">
         <img src="https://img.shields.io/packagist/l/odiseoteam/sylius-mercado-pago-plugin.svg" />
@@ -11,8 +9,8 @@
     <a href="https://packagist.org/packages/odiseoteam/sylius-mercado-pago-plugin" title="Version" target="_blank">
         <img src="https://img.shields.io/packagist/v/odiseoteam/sylius-mercado-pago-plugin.svg" />
     </a>
-    <a href="http://travis-ci.org/odiseoteam/SyliusMercadoPagoPlugin" title="Build status" target="_blank">
-        <img src="https://img.shields.io/travis/odiseoteam/SyliusMercadoPagoPlugin/master.svg" />
+    <a href="https://github.com/odiseoteam/SyliusAvataxPlugin/actions" title="Build Status" target="_blank">
+        <img src="https://img.shields.io/github/workflow/status/odiseoteam/SyliusAvataxPlugin/Build" />
     </a>
     <a href="https://scrutinizer-ci.com/g/odiseoteam/SyliusMercadoPagoPlugin/" title="Scrutinizer" target="_blank">
         <img src="https://img.shields.io/scrutinizer/g/odiseoteam/SyliusMercadoPagoPlugin.svg" />
@@ -20,13 +18,24 @@
     <a href="https://packagist.org/packages/odiseoteam/sylius-mercado-pago-plugin" title="Total Downloads" target="_blank">
         <img src="https://poser.pugx.org/odiseoteam/sylius-mercado-pago-plugin/downloads" />
     </a>
-</h1>
-<p align="center"><a href="https://sylius.com/partners/odiseo/" target="_blank"><img src="https://github.com/odiseoteam/SyliusVendorPlugin/blob/master/badge-partner-by-sylius.png" width="140"></a></p>
+    <a href="https://sylius-devs.slack.com" title="Slack" target="_blank">
+        <img src="https://img.shields.io/badge/community%20chat-slack-FF1493.svg" />
+    </a>
+    <a href="https://odiseo.io/contact?utm_source=github&utm_medium=referral&utm_campaign=plugins_vendor" title="Support" target="_blank">
+        <img src="https://img.shields.io/badge/support-contact%20author-blue" />
+    </a>
+</p>
+<p align="center"><a href="https://sylius.com/partners/odiseo/" target="_blank"><img src="https://github.com/odiseoteam/SyliusAvataxPlugin/blob/master/badge-partner-by-sylius.png" width="140"></a></p>
 
 ## Description
 
-This plugin add Mercado Pago payment method to the Sylius project.
+This plugin adds Mercado Pago payment method to the Sylius project.
+
 [Mercado Pago Developers](https://www.mercadopago.com.ar/developers/es/guides).
+
+Support Sylius version 1.9+.
+
+## Screenshots
 
 <img src="https://github.com/odiseoteam/SyliusMercadoPagoPlugin/blob/master/screenshot_1.png" alt="Mercado Pago payment">
 

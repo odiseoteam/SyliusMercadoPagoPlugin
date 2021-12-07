@@ -16,9 +16,6 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
 {
     use GatewayAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function execute($request): void
     {
         /** @var GetStatusInterface $request */
@@ -61,9 +58,6 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($request): bool
     {
         return

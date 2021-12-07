@@ -23,24 +23,14 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
 {
     use GatewayAwareTrait;
 
-    /** @var MercadoPagoApi */
-    private $api;
+    private MercadoPagoApi $api;
+    private LoggerInterface $logger;
 
-    /** @var LoggerInterface  */
-    private $logger;
-
-    /**
-     * @param MercadoPagoApi $api
-     */
     public function __construct(LoggerInterface $logger)
     {
-        $this->logger = $this->logger;
+        $this->logger = $logger;
     }
 
-
-    /**
-     * {@inheritdoc}
-     */
     public function execute($request): void
     {
         /** @var $request Notify */
@@ -68,22 +58,16 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
         throw new HttpResponse('OK', Response::HTTP_OK);
     }
 
-    /**
-     * @param array $data
-     */
     private function log(array $data): void
     {
-        $this->logger->debug(sprintf(
+        $this->logger->info(sprintf(
             '---- Mercado Pago----\ User: %s - %s\nAttempt: %s',
             $_SERVER['REMOTE_ADDR'],
             date("F j, Y, g:i a"),
-            json_encode($data),
+            json_encode($data)
         ));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function supports($request): bool
     {
         return
@@ -92,9 +76,6 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setApi($api): void
     {
         if (!$api instanceof MercadoPagoApi) {

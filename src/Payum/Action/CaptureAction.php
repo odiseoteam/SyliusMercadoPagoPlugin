@@ -35,20 +35,14 @@ final class CaptureAction implements
     use GatewayAwareTrait;
     use GenericTokenFactoryAwareTrait;
 
-    /** @var MercadoPagoApi */
-    private $api;
-
-    /** @var CacheManager */
-    private $imagineCacheManager;
+    private MercadoPagoApi $api;
+    private CacheManager $imagineCacheManager;
 
     public function __construct(CacheManager $imagineCacheManager)
     {
         $this->imagineCacheManager = $imagineCacheManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function execute($request): void
     {
         /** @var Capture $request */
@@ -208,7 +202,6 @@ final class CaptureAction implements
                     'pending' => $request->getToken()->getAfterUrl()
                 ]);
 
-                // Create notification url with Notify Token
                 $notifyToken = $this->tokenFactory->createNotifyToken(
                     $request->getToken()->getGatewayName(),
                     $request->getToken()->getDetails()
@@ -253,9 +246,6 @@ final class CaptureAction implements
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($request): bool
     {
         return
@@ -264,9 +254,6 @@ final class CaptureAction implements
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setApi($api): void
     {
         if (!$api instanceof MercadoPagoApi) {
