@@ -16,6 +16,7 @@ use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Reply\HttpResponse;
 use Payum\Core\Request\Notify;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
@@ -24,6 +25,18 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
 
     /** @var MercadoPagoApi */
     private $api;
+
+    /** @var LoggerInterface  */
+    private $logger;
+
+    /**
+     * @param MercadoPagoApi $api
+     */
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $this->logger;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -60,12 +73,12 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
      */
     private function log(array $data): void
     {
-        // Todo use a better way to log the information
-        $log  = "User: ".$_SERVER['REMOTE_ADDR'].' - '.date("F j, Y, g:i a").PHP_EOL.
-            "Attempt: ".(json_encode($data)).PHP_EOL.
-            "-------------------------".PHP_EOL;
-
-        file_put_contents(__DIR__.'/../../../../../../var/log/mercado_pago_log_'.date("j.n.Y").'.txt', $log, FILE_APPEND);
+        $this->logger->debug(sprintf(
+            '---- Mercado Pago----\ User: %s - %s\nAttempt: %s',
+            $_SERVER['REMOTE_ADDR'],
+            date("F j, Y, g:i a"),
+            json_encode($data),
+        ));
     }
 
     /**
