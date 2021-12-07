@@ -20,6 +20,7 @@ use Payum\Core\Reply\HttpRedirect;
 use Payum\Core\Request\Capture;
 use Payum\Core\Security\GenericTokenFactoryAwareInterface;
 use Payum\Core\Security\GenericTokenFactoryAwareTrait;
+use Payum\Core\Security\TokenInterface;
 use Sylius\Bundle\PayumBundle\Request\GetStatus;
 use Sylius\Component\Core\Model\AddressInterface;
 use Sylius\Component\Core\Model\CustomerInterface;
@@ -167,10 +168,18 @@ final class CaptureAction implements
 
                 $payer = new Payer();
 
-                $payerFirstName = $customer->getFirstName() !== null ? $customer->getFirstName() : $billingAddress->getFirstName();
-                $payerLastName = $customer->getLastName() !== null ? $customer->getLastName() : $billingAddress->getLastName();
-                $payerEmail = $customer->getEmail() !== null ? $customer->getEmail() : null;
-                $payerPhoneNumber = $customer->getPhoneNumber() !== null ? $customer->getPhoneNumber() : $billingAddress->getPhoneNumber();
+                $payerFirstName = $customer->getFirstName() !== null ?
+                    $customer->getFirstName() : $billingAddress->getFirstName()
+                ;
+                $payerLastName = $customer->getLastName() !== null ?
+                    $customer->getLastName() : $billingAddress->getLastName()
+                ;
+                $payerEmail = $customer->getEmail() !== null ?
+                    $customer->getEmail() : null
+                ;
+                $payerPhoneNumber = $customer->getPhoneNumber() !== null ?
+                    $customer->getPhoneNumber() : $billingAddress->getPhoneNumber()
+                ;
 
                 if ($payerFirstName !== null) {
                     $payer->__set('name', $payerFirstName);
@@ -196,17 +205,20 @@ final class CaptureAction implements
 
                 $preference->__set('external_reference', $order->getNumber());
 
+                /** @var TokenInterface $token */
+                $token = $request->getToken();
+
                 $preference->__set('back_urls', [
-                    'success' => $request->getToken()->getAfterUrl(),
-                    'failure' => $request->getToken()->getAfterUrl(),
-                    'pending' => $request->getToken()->getAfterUrl()
+                    'success' => $token->getAfterUrl(),
+                    'failure' => $token->getAfterUrl(),
+                    'pending' => $token->getAfterUrl()
                 ]);
 
                 $notifyToken = $this->tokenFactory->createNotifyToken(
-                    $request->getToken()->getGatewayName(),
-                    $request->getToken()->getDetails()
+                    $token->getGatewayName(),
+                    $token->getDetails()
                 );
-                $preference->__set('notification_url', $notifyToken->getTargetUrl().'?source_news=webhooks');
+                $preference->__set('notification_url', $notifyToken->getTargetUrl() . '?source_news=webhooks');
 
                 $preference->__set('auto_return', 'all');
 
@@ -232,6 +244,10 @@ final class CaptureAction implements
                     'preference' => null
                 ];
             } finally {
+                /**
+                 * @psalm-suppress PossiblyUndefinedVariable
+                 * @phpstan-ignore-next-line
+                 */
                 $payment->setDetails($response);
             }
 

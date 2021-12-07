@@ -31,6 +31,9 @@ final class MercadoPagoGatewayConfigurationType extends AbstractType
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
                 $data = $event->getData();
 
+                /**
+                 * @psalm-suppress MixedArrayAssignment
+                 */
                 $data['payum.http_client'] = '@sylius.payum.http_client';
             })
         ;

@@ -38,6 +38,9 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
         }
 
         if (!$status && isset($details['payment']) && isset($details['payment']['status'])) {
+            /**
+             * @psalm-suppress MixedArrayAccess
+             */
             $status = $details['payment']['status'];
         }
 

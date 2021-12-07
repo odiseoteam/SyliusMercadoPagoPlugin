@@ -33,7 +33,7 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
 
     public function execute($request): void
     {
-        /** @var $request Notify */
+        /** @var Notify $request */
         RequestNotSupportedException::assertSupports($this, $request);
 
         $details = ArrayObject::ensureArrayObject($request->getModel());
@@ -47,7 +47,10 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
             SDK::setIntegratorId('dev_11586dc9e7f311eab4a00242ac130004');
 
             if ('payment' == $data['type']) {
-                /** @var Payment $payment */
+                /**
+                 * @psalm-suppress MixedArrayAccess
+                 * @var Payment $payment
+                 */
                 $payment = Payment::find_by_id($data['data']['id']);
 
                 $paymentArray = $payment->toArray();
