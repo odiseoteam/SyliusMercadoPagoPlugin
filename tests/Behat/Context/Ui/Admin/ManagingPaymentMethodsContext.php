@@ -448,15 +448,6 @@ final class ManagingPaymentMethodsContext implements Context
     }
 
     /**
-     * @When I configure it with test stripe gateway data
-     */
-    public function iConfigureItWithTestStripeGatewayData()
-    {
-        $this->createPage->setStripeSecretKey('TEST');
-        $this->createPage->setStripePublishableKey('TEST');
-    }
-
-    /**
      * @When I configure it with test mercado pago gateway data
      */
     public function iConfigureItWithTestMercadoPagoGatewayData()

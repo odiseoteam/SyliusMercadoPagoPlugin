@@ -33,6 +33,8 @@ final class MercadoPagoGatewayConfigurationType extends AbstractType
 
                 /**
                  * @psalm-suppress MixedArrayAssignment
+                 *
+                 * @phpstan-ignore-next-line
                  */
                 $data['payum.http_client'] = '@sylius.payum.http_client';
             })

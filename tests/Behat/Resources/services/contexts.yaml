@@ -11,7 +11,6 @@ services:
             -
                 offline: Offline
                 paypal_express_checkout: Paypal Express Checkout
-                stripe_checkout: Stripe Checkout
                 mercado_pago: Mercado Pago
         tags:
             - { name: fob.context_service }
@@ -28,7 +27,6 @@ services:
             -
                 offline: Offline
                 paypal_express_checkout: Paypal Express Checkout
-                stripe_checkout: Stripe Checkout
                 mercado_pago: Mercado Pago
         tags:
             - { name: fob.context_service }

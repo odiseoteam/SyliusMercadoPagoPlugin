@@ -24,6 +24,7 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
     use GatewayAwareTrait;
 
     private MercadoPagoApi $api;
+
     private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
@@ -33,14 +34,18 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
 
     public function execute($request): void
     {
-        /** @var Notify $request */
         RequestNotSupportedException::assertSupports($this, $request);
 
-        $details = ArrayObject::ensureArrayObject($request->getModel());
+        /** @var Notify $notify */
+        $notify = $request;
 
-        $content = file_get_contents("php://input");
+        $details = ArrayObject::ensureArrayObject($notify->getModel());
+
+        $content = file_get_contents('php://input');
         if ($content !== false) {
+            /** @var array $data */
             $data = json_decode($content, true);
+
             $this->log($data);
 
             SDK::setAccessToken($this->api->getAccessToken());
@@ -49,6 +54,7 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
             if ('payment' == $data['type']) {
                 /**
                  * @psalm-suppress MixedArrayAccess
+                 *
                  * @var Payment $payment
                  */
                 $payment = Payment::find_by_id($data['data']['id']);
@@ -63,11 +69,13 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
 
     private function log(array $data): void
     {
+        $remoteAddress = $_SERVER['REMOTE_ADDR'] ?? '';
+
         $this->logger->info(sprintf(
             '---- Mercado Pago----\ User: %s - %s\nAttempt: %s',
-            $_SERVER['REMOTE_ADDR'],
-            date("F j, Y, g:i a"),
-            json_encode($data)
+            $remoteAddress,
+            date('F j, Y, g:i a'),
+            json_encode($data),
         ));
     }
 

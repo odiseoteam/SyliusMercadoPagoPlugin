@@ -7,11 +7,12 @@ namespace Odiseo\SyliusMercadoPagoPlugin\Payum;
 final class MercadoPagoApi
 {
     private string $accessToken;
+
     private bool $sandbox;
 
     public function __construct(
         string $accessToken,
-        bool $sandbox
+        bool $sandbox,
     ) {
         $this->accessToken = $accessToken;
         $this->sandbox = $sandbox;
