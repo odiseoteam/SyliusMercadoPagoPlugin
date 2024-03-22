@@ -25,11 +25,9 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
 
     private MercadoPagoApi $api;
 
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private LoggerInterface $logger,
+    ) {
     }
 
     public function execute($request): void
@@ -52,11 +50,7 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayA
             SDK::setIntegratorId('dev_11586dc9e7f311eab4a00242ac130004');
 
             if ('payment' == $data['type']) {
-                /**
-                 * @psalm-suppress MixedArrayAccess
-                 *
-                 * @var Payment $payment
-                 */
+                /** @var Payment $payment */
                 $payment = Payment::find_by_id($data['data']['id']);
 
                 $paymentArray = $payment->toArray();
