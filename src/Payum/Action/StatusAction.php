@@ -18,13 +18,16 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
 
     public function execute($request): void
     {
-        /** @var GetStatusInterface $request */
         RequestNotSupportedException::assertSupports($this, $request);
 
-        $details = ArrayObject::ensureArrayObject($request->getModel());
+        /** @var GetStatusInterface $getStatus */
+        $getStatus = $request;
+
+        /** @var array $details */
+        $details = ArrayObject::ensureArrayObject($getStatus->getModel());
 
         if (count($details) === 0 || !isset($details['preference'])) {
-            $request->markNew();
+            $getStatus->markNew();
 
             return;
         }
@@ -37,27 +40,24 @@ final class StatusAction implements ActionInterface, GatewayAwareInterface
             $status = $httpRequest->query['collection_status'];
         }
 
-        if (!$status && isset($details['payment']) && isset($details['payment']['status'])) {
-            /**
-             * @psalm-suppress MixedArrayAccess
-             */
+        if (isset($details['payment']['status']) && !$status) {
             $status = $details['payment']['status'];
         }
 
         if (!$status) {
-            $request->markNew();
+            $getStatus->markNew();
 
             return;
         }
 
         if ('approved' === $status) {
-            $request->markCaptured();
+            $getStatus->markCaptured();
         } elseif ('rejected' === $status) {
-            $request->markFailed();
+            $getStatus->markFailed();
         } elseif ('pending' === $status || 'in_process' === $status) {
-            $request->markPending();
+            $getStatus->markPending();
         } else {
-            $request->markCanceled();
+            $getStatus->markCanceled();
         }
     }
 

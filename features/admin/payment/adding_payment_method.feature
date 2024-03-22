@@ -60,16 +60,6 @@ Feature: Adding a new payment method
         And the payment method "Paypal Express Checkout" should appear in the registry
 
     @ui
-    Scenario: Adding a new stripe payment method
-        Given I want to create a new payment method with "Stripe Checkout" gateway factory
-        When I name it "Stripe Checkout" in "English (United States)"
-        And I specify its code as "SC"
-        And I configure it with test stripe gateway data
-        And I add it
-        Then I should be notified that it has been successfully created
-        And the payment method "Stripe Checkout" should appear in the registry
-
-    @ui
     Scenario: Adding a new mercado pago payment method
         Given I want to create a new payment method with "Mercado Pago" gateway factory
         When I name it "Mercado Pago" in "English (United States)"

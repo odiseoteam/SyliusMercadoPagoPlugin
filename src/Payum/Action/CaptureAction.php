@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Odiseo\SyliusMercadoPagoPlugin\Payum\Action;
 
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+//use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use MercadoPago\Item;
 use MercadoPago\Payer;
 use MercadoPago\Preference;
@@ -37,20 +37,21 @@ final class CaptureAction implements
     use GenericTokenFactoryAwareTrait;
 
     private MercadoPagoApi $api;
-    private CacheManager $imagineCacheManager;
 
-    public function __construct(CacheManager $imagineCacheManager)
-    {
-        $this->imagineCacheManager = $imagineCacheManager;
+    public function __construct(
+        //private CacheManager $imagineCacheManager
+    ) {
     }
 
     public function execute($request): void
     {
-        /** @var Capture $request */
         RequestNotSupportedException::assertSupports($this, $request);
 
+        /** @var Capture $capture */
+        $capture = $request;
+
         /** @var SyliusPaymentInterface $payment */
-        $payment = $request->getModel();
+        $payment = $capture->getModel();
 
         $this->gateway->execute($status = new GetStatus($payment));
 
@@ -165,7 +166,6 @@ final class CaptureAction implements
 
                 $preference->__set('payment_methods', $preferencePayment);
                  **/
-
                 $payer = new Payer();
 
                 $payerFirstName = $customer->getFirstName() !== null ?
@@ -192,7 +192,7 @@ final class CaptureAction implements
                 }
                 if ($payerPhoneNumber !== null) {
                     $payer->__set('phone', [
-                        'number' => $payerPhoneNumber
+                        'number' => $payerPhoneNumber,
                     ]);
                 }
 
@@ -206,17 +206,17 @@ final class CaptureAction implements
                 $preference->__set('external_reference', $order->getNumber());
 
                 /** @var TokenInterface $token */
-                $token = $request->getToken();
+                $token = $capture->getToken();
 
                 $preference->__set('back_urls', [
                     'success' => $token->getAfterUrl(),
                     'failure' => $token->getAfterUrl(),
-                    'pending' => $token->getAfterUrl()
+                    'pending' => $token->getAfterUrl(),
                 ]);
 
                 $notifyToken = $this->tokenFactory->createNotifyToken(
                     $token->getGatewayName(),
-                    $token->getDetails()
+                    $token->getDetails(),
                 );
                 $preference->__set('notification_url', $notifyToken->getTargetUrl() . '?source_news=webhooks');
 
@@ -235,23 +235,25 @@ final class CaptureAction implements
                 $response = [
                     'status' => $status,
                     'message' => $message,
-                    'preference' => $preferenceData
+                    'preference' => $preferenceData,
                 ];
             } catch (\Exception $exception) {
                 $response = [
                     'status' => $exception->getCode(),
                     'message' => $exception->getMessage(),
-                    'preference' => null
+                    'preference' => null,
                 ];
             } finally {
                 /**
                  * @psalm-suppress PossiblyUndefinedVariable
+                 *
                  * @phpstan-ignore-next-line
                  */
                 $payment->setDetails($response);
             }
 
             if ($response['status'] === 200) {
+                /** @var string $initPoint */
                 $initPoint = $this->api->isSandbox()
                     ? $preference->__get('sandbox_init_point')
                     : $preference->__get('init_point')
